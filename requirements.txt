@@ -1,0 +1,4 @@
+pyyaml>=6.0
+sentence-transformers>=2.7.0
+rank-bm25>=0.2.2
+streamlit>=1.32.0

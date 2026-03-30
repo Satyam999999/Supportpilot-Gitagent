@@ -1,0 +1,22 @@
+spec_version: "0.1.0"
+name: supportpilot-agent
+version: 0.1.0
+description: Support deflection and escalation agent for customer support workflows.
+author: satyamghosh
+license: MIT
+model:
+  preferred: claude-sonnet-4-5-20250929
+  constraints:
+    temperature: 0.2
+    max_tokens: 4096
+skills:
+  - support-resolution
+  - escalation-triage
+tools: []
+runtime:
+  max_turns: 20
+  timeout: 120
+tags:
+  - support
+  - rag
+  - escalation

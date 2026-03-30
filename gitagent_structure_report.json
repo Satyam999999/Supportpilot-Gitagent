@@ -1,0 +1,14 @@
+{
+  "project_root": "/Users/satyamghosh/Downloads/GITAGENT",
+  "passed": true,
+  "compliance_score": 1.0,
+  "present": [
+    "agent.yaml",
+    "SOUL.md",
+    "SKILL.md",
+    "skills/",
+    "skills/support-resolution/SKILL.md",
+    "skills/escalation-triage/SKILL.md"
+  ],
+  "missing": []
+}
