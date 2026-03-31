@@ -1,183 +1,219 @@
 # SupportPilot Agent
 
-Grounded support answers with confidence scoring, citation transparency, and escalation triage for uncertain or risky requests.
+> Grounded support answers with confidence scoring, citation transparency, and risk-aware escalation — built for the [Lyzr GitAgent Challenge](https://github.com/open-gitagent/gitagent).
 
-## Quick Links (Update Before Submission)
+[![GitAgent](https://img.shields.io/badge/GitAgent-0.1.0-blue)](https://github.com/open-gitagent/gitagent)
+[![Python](https://img.shields.io/badge/Python-3.10+-green)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](./LICENSE)
+[![Security Audit](https://img.shields.io/badge/Security%20Audit-13%20scenarios-red)](reports/audits/RED_TEAM_SECURITY_AUDIT.md)
 
-- GitHub Repository URL: <https://github.com/Satyam999999/Supportpilot-Gitagent.git>
-
-Submission references:
-
-- Stateful correctness audit: [reports/audits/STATEFUL_CORRECTNESS_AUDIT.md](reports/audits/STATEFUL_CORRECTNESS_AUDIT.md)
-- Red-team audit: [reports/audits/RED_TEAM_SECURITY_AUDIT.md](reports/audits/RED_TEAM_SECURITY_AUDIT.md)
+---
 
 ## What This Agent Does
 
-SupportPilot automates repetitive support workflows while keeping reliability explicit.
+Most support bots give confident answers even when they shouldn't. SupportPilot does the opposite — it tells you *how confident it is*, shows you *why* (citations), and escalates when it genuinely doesn't know.
 
-- Resolves common support questions from a grounded FAQ KB.
-- Uses hybrid retrieval to reduce single-method blind spots.
-- Returns confidence and citations instead of opaque answers.
-- Escalates ambiguous, high-risk, or policy-conflict queries with reason codes.
-- Preserves recent conversational context for follow-up questions.
+- Resolves common support questions from a grounded FAQ knowledge base
+- Uses hybrid retrieval to reduce single-method blind spots
+- Returns confidence scores and citations instead of opaque answers
+- Escalates ambiguous, high-risk, or policy-conflict queries with structured reason codes
+- Preserves recent conversational context for multi-turn follow-ups
+
+---
 
 ## Architecture
 
 ![Architecture](./architecture-diagram.svg)
 
-Core flow:
 
-1. Classify incoming query intent.
-2. Rewrite query when follow-up ambiguity is detected.
-3. Retrieve evidence with hybrid retrieval.
-4. Score confidence from retrieval and evidence quality.
-5. Either answer with citations or escalate with structured rationale.
+**Lyzr Components:** Lyzr ADK · Knowledge Base · Memory · Escalation Triage
 
-## Repository Structure
-
-- Core runtime: [src/support_agent.py](src/support_agent.py)
-- Evaluation harness: [src/evaluate.py](src/evaluate.py)
-- Demo UI: [src/demo_app.py](src/demo_app.py)
-- GitAgent structure validator: [src/validate_gitagent_structure.py](src/validate_gitagent_structure.py)
-- Knowledge base: [data/faq_kb.md](data/faq_kb.md)
-- Compliance manifest: [agent.yaml](agent.yaml)
-- Architecture notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- Failure summary: [docs/FAILURE_ANALYSIS.md](docs/FAILURE_ANALYSIS.md)
-- Test scripts: [tests](tests)
-- Audit reports: [reports/audits](reports/audits)
-- Submission report: [reports/submission](reports/submission)
-
-## Setup and Installation
-
-Prerequisites:
-
-- Python 3.10+
-- pip
-- Optional HF token for faster model pulls
-
-Install:
-
-```bash
-git clone <https://github.com/Satyam999999/Supportpilot-Gitagent.git>
-cd GITAGENT
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Optional environment file:
-
-```bash
-HF_TOKEN=your_hf_token_optional
-PYTHONUNBUFFERED=1
-```
-
-## Run the Project
-
-CLI agent:
-
-```bash
-python src/support_agent.py
-```
-
-Demo app:
-
-```bash
-streamlit run src/demo_app.py
-```
-
-Evaluation benchmark:
-
-```bash
-python src/evaluate.py
-```
-
-Structure validation:
-
-```bash
-python src/validate_gitagent_structure.py
-```
+---
 
 ## Evaluation Snapshot
 
-Source: [evaluation_results.json](evaluation_results.json)
+> Source: [`evaluation_results.json`](evaluation_results.json)
 
-- total_prompts: 25
-- grounded_rate: 1.0
-- escalation_accuracy: 0.92
-- median_latency_ms: 38.56
+| Metric | Value |
+|---|---|
+| Total prompts evaluated | 25 |
+| Grounded answer rate | 100% |
+| Escalation accuracy | 92% |
+| Median latency | 38.56 ms |
+
+---
 
 ## GitAgent Manifest Compliance
 
-Source: [agent.yaml](agent.yaml)
+> Source: [`agent.yaml`](agent.yaml)
 
 | Field | Value |
 |---|---|
-| spec_version | 0.1.0 |
-| name | supportpilot-agent |
-| version | 0.1.0 |
-| skills | support-resolution, escalation-triage |
-| tools | [] declared |
-| runtime.max_turns | 20 |
-| runtime.timeout | 120 |
+| `spec_version` | 0.1.0 |
+| `name` | supportpilot-agent |
+| `version` | 0.1.0 |
+| `skills` | support-resolution, escalation-triage |
+| `tools` | `[]` declared (see known limitations) |
+| `runtime.max_turns` | 20 |
+| `runtime.timeout_s` | 120 |
 
-Note:
-- Runtime includes an internal billing helper path while manifest tools are currently empty. This is tracked in known limitations.
+> **Note:** Runtime includes an internal billing helper path (`fetch_user_subscription`) while manifest `tools` is currently empty. This declaration-runtime drift is tracked as **B-001** in the bug report and is the top remediation priority.
+
+---
+
+## Repository Structure
+
+```
+.
+├── agent.yaml                          # GitAgent manifest
+├── requirements.txt
+├── evaluation_results.json
+│
+├── src/
+│   ├── support_agent.py                # Core agent runtime
+│   ├── evaluate.py                     # Benchmark harness
+│   ├── demo_app.py                     # Streamlit demo UI
+│   └── validate_gitagent_structure.py  # Compliance validator
+│
+├── data/
+│   └── faq_kb.md                       # Knowledge base
+│
+├── docs/
+│   ├── ARCHITECTURE.md
+│   └── FAILURE_ANALYSIS.md
+│
+├── tests/
+│   ├── test_red_team_security.py       # 13 attack scenarios
+│   └── test_stateful_correctness.py   # 17 distributed systems tests
+│
+└── reports/
+    ├── audits/
+    │   ├── RED_TEAM_SECURITY_AUDIT.md
+    │   └── STATEFUL_CORRECTNESS_AUDIT.md
+    └── submission/
+        └── GITAGENT_BUG_REPORT_ANALYSIS_SUBMISSION.md
+```
+
+---
+
+## Setup & Installation
+
+**Prerequisites:** Python 3.10+, pip, optional HF token for faster model pulls
+
+```bash
+# 1. Clone
+git clone https://github.com/Satyam999999/Supportpilot-Gitagent.git
+cd Supportpilot-Gitagent
+
+# 2. Virtual environment
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Optional: HF token for faster model pulls
+echo "HF_TOKEN=your_token_here" > .env
+```
+
+---
+
+## Run
+
+```bash
+# CLI agent
+python src/support_agent.py
+
+# Streamlit demo UI
+streamlit run src/demo_app.py
+
+# Evaluation benchmark
+python src/evaluate.py
+
+# GitAgent structure validation
+python src/validate_gitagent_structure.py
+```
+
+---
 
 ## Tool Reference
 
-### fetch_user_subscription (runtime helper)
+### `fetch_user_subscription` *(internal runtime helper)*
 
-Input:
-- user_id: string
+| Parameter | Type | Description |
+|---|---|---|
+| `user_id` | `string` | User identifier |
 
-Output:
-- plan: string
-- status: string
+**Returns:** `{"plan": string, "status": string}`
 
-Example outputs:
-- {"plan": "Pro", "status": "active"}
-- {"plan": "Unknown", "status": "unverified"}
+| Field | Possible Values |
+|---|---|
+| `plan` | `"Pro"`, `"Starter"`, `"Unknown"` |
+| `status` | `"active"`, `"trial"`, `"unverified"` |
 
-Behavior:
-- No external network call in current MVP.
-- Uses in-memory lookup and returns explicit unverified status for unknown users.
+> No external network call in current MVP. Uses in-memory lookup. Returns explicit `"unverified"` status for unknown users. Not yet declared in manifest — tracked as B-001.
 
-## Bugs Found and Fixed During Development
+---
 
-This section replaces the placeholder and summarizes what was found and improved.
+## Security & Audit Reports
 
-Fixed or improved:
+This submission goes beyond happy-path testing. All vulnerabilities were confirmed with reproducible test cases and proof-of-concept exploits.
 
-1. Added hybrid retrieval fallback strategy to reduce retrieval misses on wording variance.
-2. Added confidence plus citation output so weak grounding is visible to users.
-3. Added escalation reason codes for risky and policy-conflict paths.
-4. Added query rewriting for ambiguous follow-up turns.
-5. Added comprehensive benchmark and validator flow for repeatable checks.
+| Report | Scope | Findings |
+|---|---|---|
+| [Bug Report & Submission](reports/submission/GITAGENT_BUG_REPORT_ANALYSIS_SUBMISSION.md) | Master report — 12 bugs across 5 layers | 4 Critical · 5 High · 3 Medium |
+| [Red Team Security Audit](reports/audits/RED_TEAM_SECURITY_AUDIT.md) | 13 attack scenarios with PoC exploits | Tool injection · KB poisoning · Registry tampering |
+| [Stateful Correctness Audit](reports/audits/STATEFUL_CORRECTNESS_AUDIT.md) | 17 distributed systems test cases | Memory bleed · Idempotency · Partial execution state |
 
-Known unresolved or partially unresolved (tracked in reports):
+```bash
+# Run security red-team suite
+pytest tests/test_red_team_security.py -v
 
-1. Manifest-runtime tool declaration drift.
-2. Short-horizon memory limitations for long sessions.
-3. Need stronger tool-output and KB sanitization.
-4. Heuristic intent classification can still be prompt-steered.
-5. Registry trust hardening not fully enforced.
+# Run stateful correctness suite
+pytest tests/test_stateful_correctness.py -v
+```
 
-Details:
-
-- [reports/audits/STATEFUL_CORRECTNESS_AUDIT.md](reports/audits/STATEFUL_CORRECTNESS_AUDIT.md)
-- [reports/audits/RED_TEAM_SECURITY_AUDIT.md](reports/audits/RED_TEAM_SECURITY_AUDIT.md)
+---
 
 ## Known Limitations
 
-1. Manifest declares no tools while one internal helper is used in billing logic.
-2. Memory is list-based and short horizon, so very long sessions may degrade context quality.
-3. Sanitization and schema validation need hardening for production-grade security.
-4. Intent classification is heuristic and benefits from stronger disambiguation.
-5. Provenance and signing controls for registry trust are not fully implemented.
+| # | Limitation | Tracked In |
+|---|---|---|
+| 1 | Manifest declares no tools while one internal billing helper runs at runtime | B-001 |
+| 2 | Memory is list-based with hard truncation — long sessions (15+ turns) lose early context | B-004 |
+| 3 | Tool output and KB content are not sanitized — injection risk under adversarial inputs | B-007, B-008 |
+| 4 | Intent classification is heuristic and can be steered via keyword stuffing | B-009 |
+| 5 | Registry manifest trust relies on schema shape only — no cryptographic verification | B-012 |
 
+---
 
+## Bugs Found During Development
+
+**Fixed before submission:**
+
+1. Added hybrid retrieval fallback to reduce misses on wording variance
+2. Added confidence + citation output so weak grounding is visible
+3. Added escalation reason codes for risky and policy-conflict paths
+4. Added query rewriting for ambiguous follow-up turns
+5. Added benchmark harness and GitAgent structure validator for repeatable checks
+
+**Known open issues** — documented, reproducible, with recommended fixes:
+
+See [reports/submission/GITAGENT_BUG_REPORT_ANALYSIS_SUBMISSION.md](reports/submission/GITAGENT_BUG_REPORT_ANALYSIS_SUBMISSION.md) for the full 12-bug report with severity ratings, reproduction steps.
+
+---
+
+## Star the GitAgent Repo
+
+If this submission was useful, please star the GitAgent standard repo:
+**[https://github.com/open-gitagent/gitagent](https://github.com/open-gitagent/gitagent)**
+
+---
 
 ## License
 
-MIT
+MIT — see [LICENSE](./LICENSE)
+
+---
+
+*Built by Satyam Ghosh for the Lyzr GitAgent Challenge · [#LyzrGitAgentChallenge](https://www.linkedin.com/)*
